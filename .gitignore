@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+
+# Build output / caches
+dist
+*.tsbuildinfo
+.vite
+coverage
+
+# Env — real values stay local; .env.example (placeholders only) is committed
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+bun-debug.log*
+
+# Cloudflare Pages / Wrangler local state
+.wrangler
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# Claude Code per-user settings (shared .claude/ files can still be committed)
+.claude/settings.local.json

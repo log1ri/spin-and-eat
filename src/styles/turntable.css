@@ -1,0 +1,332 @@
+/* Turntable — drawn in px on a 342×292 deck, then scaled as a whole */
+.deck-box {
+  flex: none;
+  align-self: center;
+}
+.deck {
+  position: relative;
+  width: 342px;
+  height: 292px;
+  transform-origin: 0 0;
+  border-radius: 24px;
+  /* Off-white body sitting on the stage color like a real one on a table — one soft shadow, no glow */
+  background: #eceaf0;
+  box-sizing: border-box;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 14px 32px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+.deck-rec {
+  position: absolute;
+  inset: 0;
+}
+/* Record sits directly on the body (top-down view) — the platter is hidden under it, only its shadow shows */
+.deck-platter {
+  position: absolute;
+  left: 33px;
+  top: 8px;
+  width: 276px;
+  height: 276px;
+  border-radius: 50%;
+}
+.deck-mat {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  width: 262px;
+  height: 262px;
+  border-radius: 50%;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.35);
+}
+/* Glossy black vinyl: fine grooves + smooth outer edge + smooth run-out around the label */
+.deck-vinyl {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, 0) 0 125px, #19191c 125.5px 128px, #0b0b0d 128.5px),
+    radial-gradient(circle, #0c0c0e 0 52px, rgba(0, 0, 0, 0) 52.5px),
+    repeating-radial-gradient(circle, #0d0d0f 0px, #0d0d0f 1px, #151518 1.4px, #151518 2px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+/* Gaps between tracks (like a real record) */
+.deck-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.035);
+  box-sizing: border-box;
+}
+.deck-label {
+  position: absolute;
+  left: 84px;
+  top: 84px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+}
+.deck-label-album {
+  font-family: var(--font-mono);
+  font-size: 6.5px;
+  letter-spacing: 1px;
+  max-width: 74px;
+  line-height: 1.2;
+  opacity: 0.75;
+}
+.deck-label-text {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 72px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.deck-label-hole {
+  /* Silver spindle (not a black hole) */
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #a9a9b2 70%);
+  box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.35);
+  margin-top: 3px;
+}
+/* Record highlight — two opposite wedges like real vinyl */
+.deck-glare {
+  position: absolute;
+  left: 41px;
+  top: 16px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 200deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0.11) 18deg,
+    rgba(255, 255, 255, 0.02) 34deg,
+    rgba(255, 255, 255, 0) 50deg,
+    rgba(255, 255, 255, 0) 180deg,
+    rgba(255, 255, 255, 0.09) 198deg,
+    rgba(255, 255, 255, 0.02) 214deg,
+    rgba(255, 255, 255, 0) 230deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 46px, #000 47px);
+  mask: radial-gradient(circle, transparent 0 46px, #000 47px);
+  pointer-events: none;
+}
+/* Track ring under the needle — grooves brighten as if catching light */
+.deck-band {
+  position: absolute;
+  border-radius: 50%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+/* Tonearm base: thin silver ring on the body */
+.deck-arm-base {
+  position: absolute;
+  left: 298px;
+  top: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ffffff, #dcdae1 75%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.12);
+}
+/* Arm rest */
+.deck-arm-rest {
+  position: absolute;
+  left: 299px;
+  top: 194px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d9d9de, #7c7c86);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+/* Tonearm: pivot at (318, 34) · thin silver tube + counterweight + angled headshell */
+.deck-arm {
+  position: absolute;
+  left: 318px;
+  top: 34px;
+  width: 0;
+  height: 0;
+  filter: drop-shadow(2px 5px 3px rgba(0, 0, 0, 0.22));
+}
+/* Arm lifted (user dragging): shadow farther and softer, as if floating above the record */
+.deck-arm--lifted {
+  filter: drop-shadow(5px 11px 6px rgba(0, 0, 0, 0.26));
+}
+/* Idle affordance: the arm nudges toward the record a few times so people see it can be dragged.
+   Uses the individual `rotate` property, which composes with the inline transform: rotate(arm) */
+.deck-arm--hint {
+  animation: arm-nudge 4.5s ease-in-out 1.2s 3;
+}
+@keyframes arm-nudge {
+  0%,
+  62%,
+  100% {
+    rotate: 0deg;
+  }
+  72% {
+    rotate: 5deg;
+  }
+  80% {
+    rotate: 1.5deg;
+  }
+  88% {
+    rotate: 4deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck-arm--hint {
+    animation: none;
+  }
+}
+/* Drag hit area: 36px wide along the arm (the real arm is 4px) */
+.deck-arm-grab {
+  position: absolute;
+  left: -18px;
+  top: -14px;
+  width: 36px;
+  height: 214px;
+  touch-action: none;
+}
+.deck-arm-grab--on {
+  cursor: grab;
+}
+.deck-arm--lifted .deck-arm-grab {
+  cursor: grabbing;
+}
+.deck-arm-weight {
+  position: absolute;
+  left: -8px;
+  top: -29px;
+  width: 16px;
+  height: 18px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #4a4a52, #1d1d21 55%, #3a3a40);
+}
+.deck-arm-tube {
+  position: absolute;
+  left: -2px;
+  top: -16px;
+  width: 4px;
+  height: 186px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #e6e6eb, #9c9ca6 60%, #70707a);
+}
+.deck-arm-pivot {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f4f4f7, #9a9aa4);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+}
+.deck-arm-head {
+  position: absolute;
+  left: -6px;
+  top: 166px;
+  width: 12px;
+  height: 26px;
+  border-radius: 2px 2px 3px 3px;
+  background: linear-gradient(90deg, #2b2b30, #121214);
+  transform: rotate(-14deg);
+  transform-origin: 50% 0;
+}
+/* Headshell — album color (--stage from the player) */
+.deck-arm-head::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 14px;
+  width: 8px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--stage, #1d1d21);
+}
+/* Finger lift */
+.deck-arm-head::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 4px;
+  width: 9px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #b4b4bc;
+}
+/* Two round knobs in the bottom corners (decorative): left = speed selector, right = start button that lights while spinning */
+.deck-knob {
+  position: absolute;
+  top: 252px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 1.2px solid rgba(20, 10, 36, 0.3);
+  color: rgba(20, 10, 36, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.deck-knob--speed {
+  left: 9px;
+}
+.deck-knob--start {
+  left: 307px;
+}
+/* Spinning = start button pressed (dark dot in the center) */
+.deck-knob--on {
+  border-color: rgba(20, 10, 36, 0.6);
+  background: radial-gradient(circle, rgba(20, 10, 36, 0.75) 0 4px, transparent 4.5px);
+}
+
+
+/* Desktop (mouse): tighter tracklist — 46px rows / 15px read as oversized on a monitor; phones keep the bigger touch-friendly rows */
+@media (hover: hover) and (pointer: fine) {
+  .track-row {
+    max-height: 34px;
+    font-size: 14px;
+  }
+  .track-row .font-mono {
+    font-size: 12px;
+  }
+}
+/* Keyboard shortcut chips (desktop hint under the player buttons) */
+.kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 0.4em;
+  border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  border-radius: 6px;
+  font: 500 12px/1.6 var(--font-mono);
+  text-align: center;
+}
+/* Plex Mono's arrows are tiny — draw them bigger */
+.kbd--arrow {
+  font-size: 15px;
+  line-height: 1.25;
+}

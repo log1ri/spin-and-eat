@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- ตัวเครื่องขาวนวล + แผ่นดำ + ป้ายกลางแผ่น 6 สีของ 6 แผ่น + แขนเข็ม -->
+  <rect width="64" height="64" rx="14" fill="#ECEAF0"/>
+  <circle cx="30" cy="34" r="23" fill="#121214"/>
+  <circle cx="30" cy="34" r="18" fill="none" stroke="#2C2C32" stroke-width="1.2"/>
+  <circle cx="30" cy="34" r="13.5" fill="none" stroke="#2C2C32" stroke-width="1.2"/>
+  <g transform="translate(-2 2)">
+    <path d="M32 32L32 23A9 9 0 0 1 39.794 27.5Z" fill="#6A1FD1"/>
+    <path d="M32 32L39.794 27.5A9 9 0 0 1 39.794 36.5Z" fill="#22B357"/>
+    <path d="M32 32L39.794 36.5A9 9 0 0 1 32 41Z" fill="#FFC21A"/>
+    <path d="M32 32L32 41A9 9 0 0 1 24.206 36.5Z" fill="#FF3DA8"/>
+    <path d="M32 32L24.206 36.5A9 9 0 0 1 24.206 27.5Z" fill="#FF4D1F"/>
+    <path d="M32 32L24.206 27.5A9 9 0 0 1 32 23Z" fill="#3D5AFE"/>
+  </g>
+  <circle cx="30" cy="34" r="1.8" fill="#ECEAF0"/>
+  <path d="M54 9 L49 31 L44 37" fill="none" stroke="#8E8E98" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="54" cy="9" r="3.6" fill="#B9B9C2"/>
+</svg>

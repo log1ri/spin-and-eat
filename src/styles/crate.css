@@ -1,0 +1,395 @@
+/* Album picker: vertical cover stack, covers above/below blurred + tilted, full-screen background follows the album */
+.stage-bg {
+  position: absolute;
+  inset: 0;
+  transition:
+    background-color 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+}
+
+.stack {
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.stack-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 270px;
+  height: 270px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  transition:
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+  will-change: transform, filter;
+}
+.stack--fast .stack-card {
+  transition-duration: 0.22s;
+}
+.stack-card:focus-visible {
+  outline-offset: 6px;
+  border-radius: 10px;
+}
+
+/* Record in the sleeve: peeks out right of the center cover, slides out when selected */
+.cf-disc {
+  position: absolute;
+  top: 13px;
+  width: 244px;
+  height: 244px;
+  border-radius: 50%;
+  /* Tinted toward the stage color + soft shadow, and only 24px peeks out — pure black on the bright stage
+     pulled the eye away from the cover */
+  --groove: color-mix(in srgb, var(--stage, #000) 22%, #0f0f11);
+  --groove-hi: color-mix(in srgb, var(--stage, #000) 30%, #26262b);
+  background: repeating-radial-gradient(circle, var(--groove) 0px, var(--groove) 1.5px, var(--groove-hi) 2px, var(--groove-hi) 3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  transition:
+    left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* Spin = rotate only the highlight (a record is symmetric) — rotating the disc itself would change its
+   bounding box, which DiscFlight measures to start the flight */
+.cf-disc-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0deg 18deg,
+    rgba(255, 255, 255, 0.16) 40deg,
+    rgba(255, 255, 255, 0) 62deg 198deg,
+    rgba(255, 255, 255, 0.1) 220deg,
+    rgba(255, 255, 255, 0) 242deg
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+@keyframes sheen-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Feedback: hovering/pressing the center cover pulls the record out a little and spins it;
+   play / shuffle spin it faster */
+.stack-card[data-center]:active .cf-disc {
+  transform: translateX(14px);
+}
+.cf-disc--go,
+.stack-card[data-center]:active .cf-disc.cf-disc--go {
+  transform: translateX(22px);
+}
+.cf-disc--go .cf-disc-sheen {
+  opacity: 1;
+  animation: sheen-spin 0.9s linear infinite;
+}
+@media (hover: hover) {
+  .stack-card[data-center]:hover .cf-disc {
+    transform: translateX(22px);
+  }
+  .stack-card[data-center]:hover .cf-disc-sheen {
+    opacity: 1;
+    animation: sheen-spin 2.4s linear infinite;
+  }
+}
+/* Shuffle icon wiggles while digging through the crate */
+.shuffle-spin {
+  display: inline-flex;
+  animation: shuffle-wiggle 0.5s ease-in-out infinite;
+}
+@keyframes shuffle-wiggle {
+  50% {
+    transform: rotate(-14deg) scale(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-disc-sheen,
+  .shuffle-spin {
+    animation: none !important;
+  }
+}
+.cf-disc-label {
+  position: absolute;
+  left: 82px;
+  top: 82px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+.cf-disc-label::after {
+  content: '';
+  position: absolute;
+  left: 36px;
+  top: 36px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0a0a0c;
+}
+.cf-sleeve {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  box-shadow:
+    0 30px 60px rgba(11, 6, 20, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.cf-sleeve {
+  transition:
+    transform 0.45s cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 0.4s ease 0.05s;
+}
+.cf-sleeve--out {
+  transform: translateX(-75%) rotate(-8deg);
+  opacity: 0;
+}
+/* While selecting: title, buttons and header fade out, leaving the record center stage */
+.crate-ui {
+  transition: opacity 0.3s ease;
+}
+.crate-leaving .crate-ui {
+  opacity: 0;
+}
+/* Record flying from the sleeve to the platter (DiscFlight) */
+.flight-disc {
+  position: fixed;
+  z-index: 30;
+  pointer-events: none;
+  transition: none;
+  will-change: transform;
+}
+@keyframes player-in {
+  from {
+    opacity: 0;
+  }
+}
+.player-enter {
+  animation: player-in 0.45s ease both;
+}
+.cf-title {
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  right: 18px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.cf-th {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.cf-count {
+  position: absolute;
+  right: 14px;
+  bottom: 18px;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Huge album title: enters blurred → sharp */
+@keyframes title-in {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(18%);
+  }
+}
+.crate-title {
+  animation: title-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Round ↓ ↑ outline buttons — fill on hover */
+.ring-btn {
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+  /* press = Motion whileTap (PressButton) — no CSS transform transition, it would smear the spring */
+}
+.ring-btn:disabled {
+  opacity: 0.4;
+}
+
+/* Buttons on the stage color: primary = solid ink, secondary = outline */
+.stage-cta,
+.stage-btn {
+  transition:
+    filter 0.2s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+.stage-cta {
+  background: var(--ink);
+  color: var(--stage);
+  border: 0;
+}
+.stage-btn {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.stage-cta:disabled,
+.stage-btn:disabled {
+  opacity: 0.6;
+}
+/* Hover only on devices with a mouse — touch screens keep the hover state stuck after a tap */
+@media (hover: hover) {
+  .ring-btn:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--stage);
+  }
+  .stage-cta:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .stage-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+}
+/* Library usage hint: touch (swipe) vs mouse (hover) */
+.hint-mouse {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hint-touch {
+    display: none;
+  }
+  .hint-mouse {
+    display: inline;
+  }
+  /* Library rows: 48px touch targets on phones, tighter on a monitor (more menus per screen) */
+  .lib-row {
+    min-height: 40px;
+  }
+}
+/* Trash icon in library rows: appears on hover (mouse devices only — mobile swipes left instead) */
+@media (hover: hover) {
+  .group:hover .row-trash {
+    opacity: 0.6;
+  }
+  .group .row-trash:hover {
+    opacity: 1;
+  }
+}
+/* Input on the stage color */
+.field {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  color: var(--ink);
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+}
+/* Input on paper (menu library): faint grey fill, no border */
+.paper-field {
+  background: rgba(23, 20, 28, 0.06);
+  border: 0;
+  color: inherit;
+}
+/* Focus ring drawn inset — inside a scrolling list an outer ring gets clipped */
+.paper-field:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+.paper-field::placeholder {
+  color: rgba(23, 20, 28, 0.42);
+}
+
+.on-stage .scroll-thin {
+  scrollbar-color: color-mix(in srgb, var(--ink) 25%, transparent) transparent;
+}
+.on-stage :focus-visible {
+  outline-color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-card {
+    transition-duration: 0.15s;
+  }
+  .cf-disc {
+    transition-duration: 0.25s;
+  }
+  .crate-title,
+  .player-enter {
+    animation: none;
+  }
+  .cf-sleeve {
+    transition-duration: 0.2s;
+  }
+}
+
+/* Waiting for menus on first load: center record spins slowly — a record is rotationally symmetric, so add a highlight to make the spin visible */
+.cf-disc--spin {
+  animation: disc-wait 1.8s linear infinite;
+}
+.cf-disc--spin::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0deg 18deg,
+    rgba(255, 255, 255, 0.16) 40deg,
+    rgba(255, 255, 255, 0) 62deg 198deg,
+    rgba(255, 255, 255, 0.1) 220deg,
+    rgba(255, 255, 255, 0) 242deg
+  );
+}
+@keyframes disc-wait {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-disc--spin {
+    animation-duration: 6s;
+  }
+}
+
+/* Back to the picker: the player's text drops away while the record slides off the platter (useTurntable.backToCrate) */
+.player-fade {
+  transition:
+    opacity 0.26s ease,
+    translate 0.3s cubic-bezier(0.5, 0, 0.8, 0.4);
+}
+.player-leaving .player-fade {
+  opacity: 0;
+  translate: 0 10px;
+}
+/* …and the turntable body fades with them, so it doesn't vanish in one frame when the picker takes over */
+.player-leaving .deck-box {
+  opacity: 0;
+  transition: opacity 0.28s ease 0.04s;
+}
